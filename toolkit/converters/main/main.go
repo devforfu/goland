@@ -31,12 +31,12 @@ func main() {
 		}
 	}
 
-	println("Celsius measurements")
+	println("Celsius measurements:")
 	for _, c := range celsius {
 		println(c.String())
 	}
 
-	println("Fahrenheit measurements")
+	println("Fahrenheit measurements:")
 	for _, f := range fahrenheit {
 		println(f.String())
 	}
