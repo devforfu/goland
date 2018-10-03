@@ -35,3 +35,21 @@ func (svg *SVG) Save(filename string) {
     file.Sync()
     file.Close()
 }
+
+type Polygon struct {
+    //ax, ay, bx, by, cx, cy, dx, dy float64
+    points []float64
+    color string
+}
+
+func (p *Polygon) String() string {
+    var buffer string
+    for _, point := range p.points {
+        buffer += fmt.Sprintf("%g", point)
+    }
+    return fmt.Sprintf("<polygon points='%s', style='fill:%s' />", buffer, p.color)
+
+    //return fmt.Sprintf(
+    //    "<polygon points='%g,%g,%g,%g,%g,%g,%g,%g', style='fill:%s' />",
+    //    p.ax, p.ay, p.bx, p.by, p.cx, p.cy, p.dx, p.dy, p.color)
+}

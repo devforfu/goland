@@ -5,17 +5,6 @@ import (
     "math"
 )
 
-type Polygon struct {
-    ax, ay, bx, by, cx, cy, dx, dy float64
-    color string
-}
-
-func (p *Polygon) String() string {
-    return fmt.Sprintf(
-        "<polygon points='%g,%g,%g,%g,%g,%g,%g,%g', style='fill:%s' />",
-        p.ax, p.ay, p.bx, p.by, p.cx, p.cy, p.dx, p.dy, p.color)
-}
-
 type SurfaceFunction func (float64, float64) float64
 
 type ColorBar struct {
@@ -76,10 +65,35 @@ func (sf *Surface) CreateColorBar() {
     sf.colorBar = &ColorBar{lo,hi}
 }
 
-//func (sf *Surface) Plot() []Polygon {
-//    for i := 0; i < sf.Cells; i++ {
-//        for j := 0; j < sf.Cells; j++ {
-//
-//        }
-//    }
-//}
+func (sf *Surface) Plot() []*Polygon {
+    if sf.colorBar == nil {
+        sf.CreateColorBar()
+    }
+    n := sf.Cells
+    polygons := make([]*Polygon, n*n)
+    for i := 0; i < n; i++ {
+        for j := 0; j < n; j++ {
+            xs := [4]int{i + 1, i,     i, i + 1}
+            ys := [4]int{j    , j, j + 1, j + 1}
+            polygons[i*n + j] = sf.createPolygon(xs, ys)
+       }
+   }
+    return polygons
+}
+
+func (sf *Surface) createPolygon(xs, ys [4]int) *Polygon {
+    var average float64
+    var points [8]float64
+    for i := 0; i < 8; i += 2 {
+        x, y, z := sf.Corner(xs[i], ys[i])
+        sx, sy := sf.Projection(x, y, z)
+        if math.IsNaN(z) { return nil }
+        points[i], points[i+1] = sx, sy
+        average += z
+    }
+    average /= 4
+    alpha := sf.colorBar.Normalize(average)
+    red, blue := int(255 * alpha), int(255 * (1-alpha))
+    color := fmt.Sprintf("#%x0%x", red, blue)
+    return &Polygon{points[:], color}
+}
