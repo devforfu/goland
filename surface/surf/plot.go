@@ -30,9 +30,9 @@ type Surface struct {
 }
 
 var DefaultConfig = SurfaceConfig{
-    Width:600, Height:320,
-    Cells:100, XYRange:30.0,
-    Angle:math.Pi/6,
+   Width:600, Height:320,
+   Cells:100, XYRange:30.0,
+   Angle:math.Pi/6,
 }
 
 func (sf *Surface) Sin() float64 { return math.Sin(sf.Angle) }
@@ -65,7 +65,7 @@ func (sf *Surface) CreateColorBar() {
     sf.colorBar = &ColorBar{lo,hi}
 }
 
-func (sf *Surface) Plot() []*Polygon {
+func (sf *Surface) Plot(filename string) {
     if sf.colorBar == nil {
         sf.CreateColorBar()
     }
@@ -77,8 +77,18 @@ func (sf *Surface) Plot() []*Polygon {
             ys := [4]int{j    , j, j + 1, j + 1}
             polygons[i*n + j] = sf.createPolygon(xs, ys)
        }
-   }
-    return polygons
+    }
+    svg := SVG{
+        Stroke:"white", Fill:"white",
+        StrokeWidth:1,
+        Width:sf.Width, Height:sf.Height,
+        CloseTag:true,
+    }
+    svg.CreatePreamble()
+    for _, polygon := range polygons {
+        svg.WriteLine(polygon.String())
+    }
+    svg.Save(filename)
 }
 
 func (sf *Surface) createPolygon(xs, ys [4]int) *Polygon {
