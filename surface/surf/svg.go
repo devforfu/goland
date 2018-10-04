@@ -4,12 +4,13 @@ import (
     "fmt"
     "log"
     "os"
+    "strings"
 )
 
 // Simple string object wrapper building SVG file with polygons
 type SVG struct {
     Stroke, Fill string
-    StrokeWidth float64
+    StrokeWidth int
     Width, Height int
     CloseTag bool
     buffer string
@@ -17,7 +18,7 @@ type SVG struct {
 
 func (svg *SVG) CreatePreamble() {
     preamble := fmt.Sprintf("<svg xmlns='http://www.w3.org/2000/svg' " +
-        "style='stroke: %s; fill: %s; stroke-width: %f' " +
+        "style='stroke: %s; fill: %s; stroke-width: %d' " +
         "width='%d' height='%d'>",
         svg.Stroke, svg.Fill, svg.StrokeWidth, svg.Width, svg.Height)
     svg.WriteLine(preamble)
@@ -43,11 +44,12 @@ type Polygon struct {
 }
 
 func (p *Polygon) String() string {
-    var buffer string
-    for _, point := range p.points {
-        buffer += fmt.Sprintf("%g", point)
+    var buffer = make([]string, len(p.points))
+    for i, point := range p.points {
+        buffer[i] = fmt.Sprintf("%g", point)
     }
-    return fmt.Sprintf("<polygon points='%s', style='fill:%s' />", buffer, p.color)
+    joined := strings.Join(buffer, ",")
+    return fmt.Sprintf("<polygon points='%s', style='fill:%s' />", joined, p.color)
 
     //return fmt.Sprintf(
     //    "<polygon points='%g,%g,%g,%g,%g,%g,%g,%g', style='fill:%s' />",
