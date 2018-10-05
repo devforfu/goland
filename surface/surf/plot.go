@@ -68,11 +68,7 @@ func (sf *Surface) CreateColorBar() {
     sf.colorBar = &ColorBar{lo,hi}
 }
 
-func (sf *Surface) DefaultPlot(filename string) {
-    sf.Plot(filename, "while", 1)
-}
-
-func (sf *Surface) Plot(filename string, strokeColor string, strokeWidth int) {
+func (sf *Surface) Plot(strokeColor string, strokeWidth int) *SVG {
     if sf.colorBar == nil {
         sf.CreateColorBar()
     }
@@ -97,7 +93,8 @@ func (sf *Surface) Plot(filename string, strokeColor string, strokeWidth int) {
             svg.WriteLine(polygon.String())
         }
     }
-    svg.Save(filename)
+    return &svg
+    //svg.Save(filename)
 }
 
 func (sf *Surface) createPolygon(xs, ys []int) *Polygon {

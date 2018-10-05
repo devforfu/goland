@@ -1,10 +1,9 @@
 package main
 
 import (
+    "./surf"
     "flag"
     "fmt"
-    "math"
-    "./surf"
     "os"
     "reflect"
     "strings"
@@ -26,8 +25,8 @@ func main() {
     flag.Parse()
 
     functions := map[string]surf.SurfaceFunction {
-        "wave": wave,
-        "smoothed": smoothedWave,
+        "wave": surf.Wave,
+        "smoothed": surf.SmoothedWave,
     }
 
     function := functions[*functionName]
@@ -48,16 +47,6 @@ func main() {
     config.Height = *height
     config.XYRange = *xyRange
     surface := surf.Surface{Function:function, SurfaceConfig:config}
-    surface.Plot(*filename, *strokeColor, *strokeWidth)
+    svg := surface.Plot(*strokeColor, *strokeWidth)
+    svg.Save(*filename)
 }
-
-func wave(x, y float64) float64 {
-    r := math.Hypot(x, y)
-    return math.Sin(r) / r
-}
-
-func smoothedWave(x, y float64) float64 {
-    w := wave(x, y)
-    return w*w
-}
-
