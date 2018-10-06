@@ -22,8 +22,6 @@ func init() {
 }
 
 func main() {
-    flag.Parse()
-
     functions := map[string]surf.SurfaceFunction {
         "wave": surf.Wave,
         "smoothed": surf.SmoothedWave,
