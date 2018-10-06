@@ -6,6 +6,8 @@ import (
     "fmt"
     "log"
     "net/http"
+    "net/url"
+    "strconv"
     "strings"
 )
 
@@ -36,8 +38,32 @@ func echo(w http.ResponseWriter, r *http.Request) {
 }
 
 func plotSurface(w http.ResponseWriter, r *http.Request) {
-    surface := surf.Surface{Function:surf.Wave, SurfaceConfig:surf.DefaultConfig}
+    params := parseQuery(r.URL)
+    config := surf.DefaultConfig
+    config.Width = parseInt(params, "width", config.Width)
+    config.Height = parseInt(params, "height", config.Height)
+    surface := surf.Surface{Function:surf.Wave, SurfaceConfig:config}
     svg := surface.Plot("white",1.0)
     response := fmt.Sprintf("<html><head></head><body>%s</body></html>", svg.String())
     fmt.Fprintf(w, response)
+}
+
+func parseQuery(url *url.URL) map[string]string {
+    params := map[string]string{}
+    for k, v := range url.Query() {
+        params[k] = strings.Join(v, "")
+    }
+    return params
+}
+
+func parseInt(params map[string]string, key string, defaultValue int) int {
+    value, ok := params[key]
+    if !ok {
+        return defaultValue
+    }
+    parsed, err := strconv.ParseInt(value, 10, 64)
+    if err != nil {
+        return defaultValue
+    }
+    return int(parsed)
 }
