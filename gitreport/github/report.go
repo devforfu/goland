@@ -1,13 +1,19 @@
 package github
 
-import "fmt"
+import (
+    "fmt"
+    "html/template"
+    "io"
+    "log"
+    "os"
+)
 
 const defaultTemplate = `{{.TotalCount}} issues:
 {{range .Items}}----------------------------------------
 Number: {{.Number}}
 User:   {{.User.Login}}
 Title:  {{.Title | printf "%.64s"}}
-Age:    {{.DaysAgo()}} days
+Age:    {{.DaysAgo}} ago
 {{end}}`
 
 // SimpleReport prints a list of retrieved issues in tabular format.
@@ -21,5 +27,15 @@ func (isr *IssuesSearchResult) SimpleReport() {
 }
 
 func (isr *IssuesSearchResult) FormattedReport() {
+    isr.TemplateReport(os.Stdout, defaultTemplate)
+}
 
+func (isr *IssuesSearchResult) TemplateReport(io io.Writer, templ string) {
+    report, err := template.New("report").Parse(templ)
+    if err != nil {
+        log.Fatal(err)
+    }
+    if err := report.Execute(io, isr); err != nil {
+        log.Fatal(err)
+    }
 }
