@@ -41,7 +41,7 @@ func downloadPage(url string) ([]byte, error) {
         return nil, fmt.Errorf("parsing %s as HTML: %v", url, resp.Status)
     }
     var data bytes.Buffer
-    _, err := io.Copy(&data, resp.Body)
+    _, err = io.Copy(&data, resp.Body)
     if err != nil { return nil, err }
     return string(data.Bytes()), nil
 }
